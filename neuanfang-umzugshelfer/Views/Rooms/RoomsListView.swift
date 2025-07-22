@@ -17,7 +17,7 @@ struct RoomsListView: View {
     @State private var showingAddRoom = false
     @State private var showingFilterSheet = false
     @State private var showingStatsSheet = false
-    @State private var selectedRoom: Room?
+    
     
     private let gridColumns = [
         GridItem(.adaptive(minimum: 160), spacing: 16)
@@ -55,9 +55,6 @@ struct RoomsListView: View {
                         // Rooms Grid
                         RoomsGridSection(
                             rooms: viewModel.filteredRooms,
-                            onRoomSelected: { room in
-                                selectedRoom = room
-                            },
                             onRoomToggled: { room in
                                 viewModel.toggleRoomCompletion(room)
                             }
@@ -112,11 +109,7 @@ struct RoomsListView: View {
                     .presentationDetents([.medium, .large])
                     .presentationDragIndicator(.visible)
             }
-            .sheet(item: $selectedRoom) { room in
-                NavigationStack {
-                    RoomDetailView(room: room)
-                }
-            }
+            
             .alert("Fehler", isPresented: .constant(viewModel.errorMessage != nil)) {
                 Button("OK") {
                     viewModel.errorMessage = nil
@@ -263,9 +256,9 @@ struct SearchAndFilterSection: View {
 
 // MARK: - Rooms Grid Section
 
+
 struct RoomsGridSection: View {
     let rooms: [Room]
-    let onRoomSelected: (Room) -> Void
     let onRoomToggled: (Room) -> Void
     
     private let gridColumns = [
@@ -275,11 +268,13 @@ struct RoomsGridSection: View {
     var body: some View {
         LazyVGrid(columns: gridColumns, spacing: 16) {
             ForEach(rooms, id: \.objectID) { room in
-                RoomCardView(
-                    room: room,
-                    onTap: { onRoomSelected(room) },
-                    onToggleCompletion: { onRoomToggled(room) }
-                )
+                NavigationLink(destination: RoomDetailView(room: room)) {
+                    RoomCardView(
+                        room: room,
+                        onToggleCompletion: { onRoomToggled(room) }
+                    )
+                }
+                .buttonStyle(PlainButtonStyle())
             }
         }
     }
@@ -289,14 +284,12 @@ struct RoomsGridSection: View {
 
 struct RoomCardView: View {
     let room: Room
-    let onTap: () -> Void
     let onToggleCompletion: () -> Void
     
     @State private var isPressed = false
     
     var body: some View {
-        Button(action: onTap) {
-            VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 12) {
                 // Header with icon and status
                 HStack {
                     Image(systemName: room.iconName)
@@ -355,14 +348,13 @@ struct RoomCardView: View {
             }
             .padding()
             .frame(height: 140)
-        }
-        .liquidGlass(.floating)
-        .glassDepth(.elevated)
-        .scaleEffect(isPressed ? 0.95 : 1.0)
-        .animation(.easeInOut(duration: 0.1), value: isPressed)
-        .onLongPressGesture(minimumDuration: 0, maximumDistance: .infinity) { pressing in
-            isPressed = pressing
-        } perform: {}
+            .liquidGlass(.floating)
+            .glassDepth(.elevated)
+            .scaleEffect(isPressed ? 0.95 : 1.0)
+            .animation(.easeInOut(duration: 0.1), value: isPressed)
+            .onLongPressGesture(minimumDuration: 0, maximumDistance: .infinity) { pressing in
+                isPressed = pressing
+            } perform: {}
     }
 }
 
