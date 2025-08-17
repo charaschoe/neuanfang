@@ -1,0 +1,11 @@
+/* Localizable.strings */
+
+"APP_NAME" = "Neuanfang Umzugshelfer";
+"WELCOME_MESSAGE" = "Welcome to your moving helper!";
+"BOXES_TITLE" = "Boxes";
+"ITEMS_TITLE" = "Items";
+"ROOMS_TITLE" = "Rooms";
+"SETTINGS_TITLE" = "Settings";
+"ADD_BUTTON" = "Add";
+"SAVE_BUTTON" = "Save";
+"CANCEL_BUTTON" = "Cancel";
