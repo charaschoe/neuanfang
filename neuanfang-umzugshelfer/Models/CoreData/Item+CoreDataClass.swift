@@ -214,6 +214,73 @@ public class Item: NSManagedObject, Identifiable {
             createdDate: createdDate ?? Date()
         )
     }
+    
+    // MARK: - Validation
+    
+    public override func validateForInsert() throws {
+        try super.validateForInsert()
+        try validateItemData()
+    }
+    
+    public override func validateForUpdate() throws {
+        try super.validateForUpdate()
+        try validateItemData()
+    }
+    
+    private func validateItemData() throws {
+        // Validate name
+        guard let itemName = name else {
+            throw ValidationError.missingName
+        }
+        
+        let nameValidation = InputValidator.shared.validateName(itemName)
+        guard nameValidation.isValid else {
+            throw ValidationError.invalidName(nameValidation.errorMessage ?? "Invalid name")
+        }
+        
+        // Validate estimated value
+        let valueValidation = InputValidator.shared.validateValue(String(estimatedValue))
+        guard valueValidation.isValid else {
+            throw ValidationError.invalidValue(valueValidation.errorMessage ?? "Invalid value")
+        }
+        
+        // Validate description if provided
+        if let description = itemDescription, !description.isEmpty {
+            let descriptionValidation = InputValidator.shared.validateDescription(description)
+            guard descriptionValidation.isValid else {
+                throw ValidationError.invalidDescription(descriptionValidation.errorMessage ?? "Invalid description")
+            }
+        }
+        
+        // Sanitize and set validated data
+        self.name = itemName.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let description = itemDescription {
+            self.itemDescription = description.trimmingCharacters(in: .whitespacesAndNewlines)
+            if self.itemDescription?.isEmpty == true {
+                self.itemDescription = nil
+            }
+        }
+    }
+    
+    enum ValidationError: Error, LocalizedError {
+        case missingName
+        case invalidName(String)
+        case invalidValue(String)
+        case invalidDescription(String)
+        
+        var errorDescription: String? {
+            switch self {
+            case .missingName:
+                return NSLocalizedString("validation.item.missingName", comment: "Item name is required")
+            case .invalidName(let message):
+                return message
+            case .invalidValue(let message):
+                return message
+            case .invalidDescription(let message):
+                return message
+            }
+        }
+    }
 }
 
 // MARK: - Item Category Extension

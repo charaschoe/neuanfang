@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CloudKit</key>
+    <dict>
+        <key>ContainerIdentifier</key>
+        <string>iCloud.com.neuanfang.umzugshelfer</string>
+        <key>Environment</key>
+        <string>production</string>
+        <key>BatchSize</key>
+        <integer>50</integer>
+        <key>SyncTimeout</key>
+        <integer>30</integer>
+    </dict>
+    <key>App</key>
+    <dict>
+        <key>Version</key>
+        <string>1.0.0</string>
+        <key>Build</key>
+        <string>1</string>
+        <key>MinimumIOSVersion</key>
+        <string>15.0</string>
+    </dict>
+    <key>Security</key>
+    <dict>
+        <key>EncryptionEnabled</key>
+        <true/>
+        <key>FileProtectionLevel</key>
+        <string>complete</string>
+        <key>CloudKitEncryptionEnabled</key>
+        <true/>
+    </dict>
+    <key>Development</key>
+    <dict>
+        <key>DebugLogging</key>
+        <false/>
+        <key>TestMode</key>
+        <false/>
+    </dict>
+</dict>
+</plist>

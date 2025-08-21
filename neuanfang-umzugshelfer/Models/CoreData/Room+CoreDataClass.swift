@@ -140,6 +140,47 @@ public class Room: NSManagedObject, Identifiable {
         managedObjectContext?.delete(box)
         updatePackingProgress()
     }
+    
+    // MARK: - Validation
+    
+    public override func validateForInsert() throws {
+        try super.validateForInsert()
+        try validateRoomData()
+    }
+    
+    public override func validateForUpdate() throws {
+        try super.validateForUpdate()
+        try validateRoomData()
+    }
+    
+    private func validateRoomData() throws {
+        // Validate name
+        guard let roomName = name else {
+            throw ValidationError.missingName
+        }
+        
+        let nameValidation = InputValidator.shared.validateName(roomName)
+        guard nameValidation.isValid else {
+            throw ValidationError.invalidName(nameValidation.errorMessage ?? "Invalid name")
+        }
+        
+        // Sanitize and set validated name
+        self.name = roomName.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+    
+    enum ValidationError: Error, LocalizedError {
+        case missingName
+        case invalidName(String)
+        
+        var errorDescription: String? {
+            switch self {
+            case .missingName:
+                return NSLocalizedString("validation.room.missingName", comment: "Room name is required")
+            case .invalidName(let message):
+                return message
+            }
+        }
+    }
 }
 
 // MARK: - Room Types

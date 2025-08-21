@@ -117,7 +117,12 @@ final class NFCService: NSObject, ObservableObject, NFCServiceProtocol {
     
     private func createNDEFMessage(from boxData: BoxShareData) -> NFCNDEFMessage? {
         do {
-            let jsonData = try JSONEncoder().encode(boxData)
+            // Erstelle verschlüsselte JSON-Daten mit CryptoManager
+            guard let encryptedJsonData = CryptoManager.shared.createEncryptedNFCPayload(from: boxData) else {
+                errorMessage = "Fehler beim Verschlüsseln der NFC-Daten"
+                print("NFCService: Verschlüsselung der BoxShareData fehlgeschlagen")
+                return nil
+            }
             
             // Create NDEF records
             var records: [NFCNDEFPayload] = []
@@ -127,25 +132,27 @@ final class NFCService: NSObject, ObservableObject, NFCServiceProtocol {
                 records.append(appRecord)
             }
             
-            // Add JSON data record
+            // Add encrypted JSON data record
             let jsonRecord = NFCNDEFPayload(
                 format: .media,
                 type: "application/json".data(using: .utf8)!,
-                identifier: "neuanfang-box".data(using: .utf8)!,
-                payload: jsonData
+                identifier: "neuanfang-box-encrypted".data(using: .utf8)!, // Neuer Identifier für verschlüsselte Daten
+                payload: encryptedJsonData
             )
             records.append(jsonRecord)
             
-            // Add text record for human readability
+            // Add text record for human readability (unverschlüsselt für Lesbarkeit)
             let textContent = createHumanReadableText(from: boxData)
             if let textRecord = NFCNDEFPayload.wellKnownTypeTextPayload(string: textContent, locale: Locale(identifier: "de_DE")) {
                 records.append(textRecord)
             }
             
+            print("NFCService: NFC-Tag mit verschlüsselten Daten erstellt (\(encryptedJsonData.count) Bytes)")
             return NFCNDEFMessage(records: records)
             
         } catch {
             errorMessage = "Fehler beim Erstellen der NFC-Daten: \(error.localizedDescription)"
+            print("NFCService: Fehler beim Erstellen der NDEF-Nachricht: \(error)")
             return nil
         }
     }
@@ -172,14 +179,29 @@ final class NFCService: NSObject, ObservableObject, NFCServiceProtocol {
             // Try to parse JSON record
             if let typeString = String(data: record.type, encoding: .utf8),
                typeString == "application/json",
-               let identifier = String(data: record.identifier, encoding: .utf8),
-               identifier == "neuanfang-box" {
+               let identifier = String(data: record.identifier, encoding: .utf8) {
                 
-                do {
-                    let boxData = try JSONDecoder().decode(BoxShareData.self, from: record.payload)
-                    return boxData
-                } catch {
-                    print("Failed to decode JSON from NFC: \(error)")
+                // Prüfe zuerst auf verschlüsselte Daten
+                if identifier == "neuanfang-box-encrypted" {
+                    print("NFCService: Verschlüsselter NFC-Tag erkannt")
+                    if let boxData = CryptoManager.shared.decryptNFCPayload(from: record.payload) {
+                        print("NFCService: Verschlüsselte Daten erfolgreich entschlüsselt")
+                        return boxData
+                    } else {
+                        print("NFCService: Fehler beim Entschlüsseln der NFC-Daten")
+                        errorMessage = "Verschlüsselte NFC-Daten konnten nicht entschlüsselt werden"
+                    }
+                }
+                // Fallback: Legacy unverschlüsselte Daten
+                else if identifier == "neuanfang-box" {
+                    print("NFCService: Legacy unverschlüsselter NFC-Tag erkannt")
+                    do {
+                        let boxData = try JSONDecoder().decode(BoxShareData.self, from: record.payload)
+                        print("NFCService: Legacy-Daten erfolgreich gelesen")
+                        return boxData
+                    } catch {
+                        print("NFCService: Fehler beim Dekodieren der Legacy JSON-Daten: \(error)")
+                    }
                 }
             }
             
@@ -189,11 +211,13 @@ final class NFCService: NSObject, ObservableObject, NFCServiceProtocol {
                typeString == "T" {
                 
                 if let textPayload = String(data: record.payload.dropFirst(3), encoding: .utf8) {
+                    print("NFCService: Fallback zu Text-Parsing")
                     return parseTextPayload(textPayload)
                 }
             }
         }
         
+        print("NFCService: Keine gültigen NFC-Daten gefunden")
         return nil
     }
     
@@ -441,6 +465,9 @@ enum NFCError: LocalizedError {
     case tagNotSupported
     case tagReadOnly
     case capacityExceeded
+    case encryptionFailed
+    case decryptionFailed
+    case keyGenerationFailed
     
     var errorDescription: String? {
         switch self {
@@ -466,6 +493,12 @@ enum NFCError: LocalizedError {
             return "NFC-Tag ist schreibgeschützt"
         case .capacityExceeded:
             return "Daten zu groß für NFC-Tag"
+        case .encryptionFailed:
+            return "Verschlüsselung der NFC-Daten fehlgeschlagen"
+        case .decryptionFailed:
+            return "Entschlüsselung der NFC-Daten fehlgeschlagen"
+        case .keyGenerationFailed:
+            return "Verschlüsselungsschlüssel konnte nicht erstellt werden"
         }
     }
 }

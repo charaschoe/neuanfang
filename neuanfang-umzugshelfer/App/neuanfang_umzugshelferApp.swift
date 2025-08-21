@@ -80,7 +80,7 @@ final class AppState: ObservableObject {
     }
 }
 
-/// User profile model
+/// User profile model with validation support
 struct UserProfile: Codable, Identifiable {
     let id = UUID()
     var name: String
@@ -89,6 +89,71 @@ struct UserProfile: Codable, Identifiable {
     var currentAddress: String?
     var newAddress: String?
     var preferredLanguage: String = "de"
+    
+    // MARK: - Validation
+    
+    var isValid: Bool {
+        isNameValid && isEmailValid && isCurrentAddressValid && isNewAddressValid
+    }
+    
+    var isNameValid: Bool {
+        InputValidator.shared.validateName(name).isValid
+    }
+    
+    var isEmailValid: Bool {
+        InputValidator.shared.validateEmail(email).isValid
+    }
+    
+    var isCurrentAddressValid: Bool {
+        guard let address = currentAddress, !address.isEmpty else { return true }
+        return InputValidator.shared.validateAddress(address).isValid
+    }
+    
+    var isNewAddressValid: Bool {
+        guard let address = newAddress, !address.isEmpty else { return true }
+        return InputValidator.shared.validateAddress(address).isValid
+    }
+    
+    // MARK: - Validation Results
+    
+    var nameValidationResult: InputValidator.ValidationResult {
+        InputValidator.shared.validateName(name)
+    }
+    
+    var emailValidationResult: InputValidator.ValidationResult {
+        InputValidator.shared.validateEmail(email)
+    }
+    
+    var currentAddressValidationResult: InputValidator.ValidationResult {
+        guard let address = currentAddress else { return .valid }
+        return InputValidator.shared.validateAddress(address)
+    }
+    
+    var newAddressValidationResult: InputValidator.ValidationResult {
+        guard let address = newAddress else { return .valid }
+        return InputValidator.shared.validateAddress(address)
+    }
+    
+    // MARK: - Sanitization
+    
+    mutating func sanitizeInputs() {
+        name = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        email = email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        
+        if let address = currentAddress {
+            currentAddress = address.trimmingCharacters(in: .whitespacesAndNewlines)
+            if currentAddress?.isEmpty == true {
+                currentAddress = nil
+            }
+        }
+        
+        if let address = newAddress {
+            newAddress = address.trimmingCharacters(in: .whitespacesAndNewlines)
+            if newAddress?.isEmpty == true {
+                newAddress = nil
+            }
+        }
+    }
     
     static let mock = UserProfile(
         name: "Max Mustermann",

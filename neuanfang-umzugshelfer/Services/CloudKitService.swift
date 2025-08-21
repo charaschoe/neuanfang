@@ -19,7 +19,7 @@ final class CloudKitService: ObservableObject {
     @Published var lastSyncDate: Date?
     @Published var errorMessage: String?
     
-    private let container = CKContainer(identifier: "iCloud.com.neuanfang.umzugshelfer")
+    private let container: CKContainer
     private let database: CKDatabase
     private var cancellables = Set<AnyCancellable>()
     
@@ -49,6 +49,9 @@ final class CloudKitService: ObservableObject {
     }
     
     private init() {
+        // Initialize container with configuration
+        let containerIdentifier = ConfigurationManager.shared.cloudKitContainerIdentifier
+        self.container = CKContainer(identifier: containerIdentifier)
         self.database = container.privateCloudDatabase
         setupNotifications()
     }

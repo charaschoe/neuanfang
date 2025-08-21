@@ -178,6 +178,58 @@ public class Box: NSManagedObject, Identifiable {
             }
         )
     }
+    
+    // MARK: - Validation
+    
+    public override func validateForInsert() throws {
+        try super.validateForInsert()
+        try validateBoxData()
+    }
+    
+    public override func validateForUpdate() throws {
+        try super.validateForUpdate()
+        try validateBoxData()
+    }
+    
+    private func validateBoxData() throws {
+        // Validate name
+        guard let boxName = name else {
+            throw ValidationError.missingName
+        }
+        
+        let nameValidation = InputValidator.shared.validateName(boxName)
+        guard nameValidation.isValid else {
+            throw ValidationError.invalidName(nameValidation.errorMessage ?? "Invalid name")
+        }
+        
+        // Validate estimated value if set
+        if estimatedValue > 0 {
+            let valueValidation = InputValidator.shared.validateValue(String(estimatedValue))
+            guard valueValidation.isValid else {
+                throw ValidationError.invalidValue(valueValidation.errorMessage ?? "Invalid value")
+            }
+        }
+        
+        // Sanitize and set validated name
+        self.name = boxName.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+    
+    enum ValidationError: Error, LocalizedError {
+        case missingName
+        case invalidName(String)
+        case invalidValue(String)
+        
+        var errorDescription: String? {
+            switch self {
+            case .missingName:
+                return NSLocalizedString("validation.box.missingName", comment: "Box name is required")
+            case .invalidName(let message):
+                return message
+            case .invalidValue(let message):
+                return message
+            }
+        }
+    }
 }
 
 // MARK: - Box Priority

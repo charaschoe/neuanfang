@@ -84,10 +84,14 @@ struct OnboardingView: View {
     }
     
     private var isProfileComplete: Bool {
-        !userProfile.name.isEmpty && !userProfile.email.isEmpty
+        let nameValid = InputValidator.shared.validateName(userProfile.name).isValid
+        let emailValid = InputValidator.shared.validateEmail(userProfile.email).isValid
+        return nameValid && emailValid
     }
     
     private func completeOnboarding() {
+        // Sanitize inputs before saving
+        userProfile.sanitizeInputs()
         appState.currentUser = userProfile
         appState.completeOnboarding()
     }
@@ -233,17 +237,35 @@ struct FeatureCard: View {
 struct ProfileContentView: View {
     @Binding var userProfile: UserProfile
     @State private var movingDate = Date()
+    @State private var nameValidation = InputValidator.ValidationResult.valid
+    @State private var emailValidation = InputValidator.ValidationResult.valid
+    @StateObject private var validator = InputValidator.shared
     
     var body: some View {
         VStack(spacing: 20) {
             VStack(spacing: 16) {
-                TextField("Name", text: $userProfile.name)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                // Name field with validation
+                VStack(alignment: .leading, spacing: 4) {
+                    ValidatedTextField(
+                        "Name",
+                        text: $userProfile.name,
+                        validator: { name in
+                            validator.validateName(name)
+                        }
+                    )
+                }
                 
-                TextField("E-Mail", text: $userProfile.email)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .keyboardType(.emailAddress)
-                    .autocapitalization(.none)
+                // Email field with validation
+                VStack(alignment: .leading, spacing: 4) {
+                    ValidatedTextField(
+                        "E-Mail",
+                        text: $userProfile.email,
+                        validator: { email in
+                            validator.validateEmail(email)
+                        },
+                        keyboardType: .emailAddress
+                    )
+                }
                 
                 DatePicker("Umzugsdatum (optional)", selection: $movingDate, displayedComponents: .date)
                     .onChange(of: movingDate) { _, newValue in
@@ -252,6 +274,12 @@ struct ProfileContentView: View {
             }
             .padding()
             .liquidGlass(.floating)
+        }
+        .onChange(of: userProfile.name) { _, _ in
+            nameValidation = validator.validateName(userProfile.name)
+        }
+        .onChange(of: userProfile.email) { _, _ in
+            emailValidation = validator.validateEmail(userProfile.email)
         }
     }
 }

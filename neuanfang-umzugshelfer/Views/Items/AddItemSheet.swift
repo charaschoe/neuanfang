@@ -12,14 +12,37 @@ struct AddItemSheet: View {
     @State private var suggestedCategory: ItemCategory = .other
     @State private var predictedIsFragile: Bool = false
     @StateObject private var cameraService = CameraService()
+    
+    // Validation states
+    @State private var nameValidation = InputValidator.ValidationResult.valid
+    @State private var valueValidation = InputValidator.ValidationResult.valid
+    @StateObject private var validator = InputValidator.shared
 
     var body: some View {
         NavigationView {
             Form {
                 Section(header: Text("Neuen Gegenstand erstellen")) {
-                    TextField("Name des Gegenstands", text: $itemName)
-                    TextField("Wert", text: $itemValue)
-                        .keyboardType(.decimalPad)
+                    VStack(alignment: .leading, spacing: 4) {
+                        ValidatedTextField(
+                            "Name des Gegenstands",
+                            text: $itemName,
+                            validator: { name in
+                                validator.validateName(name)
+                            }
+                        )
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        ValidatedTextField(
+                            "Wert",
+                            text: $itemValue,
+                            validator: { value in
+                                validator.validateValue(value)
+                            },
+                            keyboardType: .decimalPad
+                        )
+                    }
+                    
                     Toggle("Zerbrechlich", isOn: $isFragile)
                 }
                 
@@ -74,9 +97,18 @@ struct AddItemSheet: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Speichern") {
+                        let sanitizedName = itemName.trimmingCharacters(in: .whitespacesAndNewlines)
+                        let sanitizedValue = itemValue.trimmingCharacters(in: .whitespacesAndNewlines)
+                        
+                        // Validate before saving
+                        guard validator.validateName(sanitizedName).isValid,
+                              validator.validateValue(sanitizedValue).isValid else {
+                            return
+                        }
+                        
                         let newItem = Item(context: box.managedObjectContext!)
-                        newItem.name = itemName
-                        newItem.value = Double(itemValue) ?? 0.0
+                        newItem.name = sanitizedName
+                        newItem.value = Double(sanitizedValue) ?? 0.0
                         newItem.isFragile = isFragile
                         newItem.box = box
                         
@@ -92,7 +124,7 @@ struct AddItemSheet: View {
                             print("Failed to save item: \(error.localizedDescription)")
                         }
                     }
-                    .disabled(itemName.isEmpty)
+                    .disabled(!isFormValid)
                 }
             }
             .sheet(isPresented: $showingImagePicker) {
@@ -112,9 +144,28 @@ struct AddItemSheet: View {
                 Task {
                     _ = await cameraService.requestCameraPermission()
                 }
+                validateForm()
+            }
+            .onChange(of: itemName) { _, _ in
+                validateForm()
+            }
+            .onChange(of: itemValue) { _, _ in
+                validateForm()
             }
             .modifier(liquidGlass(.overlay))
         }
+    }
+    
+    private var isFormValid: Bool {
+        nameValidation.isValid &&
+        valueValidation.isValid &&
+        !itemName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+        !itemValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+    
+    private func validateForm() {
+        nameValidation = validator.validateName(itemName)
+        valueValidation = validator.validateValue(itemValue)
     }
 }
 

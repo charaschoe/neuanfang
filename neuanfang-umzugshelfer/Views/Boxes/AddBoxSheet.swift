@@ -5,12 +5,22 @@ struct AddBoxSheet: View {
     @Environment(\.dismiss) var dismiss
     @ObservedObject var room: Room
     @State private var boxName = ""
+    @State private var nameValidation = InputValidator.ValidationResult.valid
+    @StateObject private var validator = InputValidator.shared
 
     var body: some View {
         NavigationView {
             Form {
                 Section(header: Text("Neue Kiste erstellen")) {
-                    TextField("Name der Kiste", text: $boxName)
+                    VStack(alignment: .leading, spacing: 4) {
+                        ValidatedTextField(
+                            "Name der Kiste",
+                            text: $boxName,
+                            validator: { name in
+                                validator.validateName(name)
+                            }
+                        )
+                    }
                 }
             }
             .navigationTitle("Neue Kiste")
@@ -22,8 +32,15 @@ struct AddBoxSheet: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Speichern") {
+                        let sanitizedName = boxName.trimmingCharacters(in: .whitespacesAndNewlines)
+                        
+                        // Validate before saving
+                        guard validator.validateName(sanitizedName).isValid else {
+                            return
+                        }
+                        
                         let newBox = Box(context: room.managedObjectContext!)
-                        newBox.name = boxName
+                        newBox.name = sanitizedName
                         newBox.room = room
                         
                         do {
@@ -34,11 +51,25 @@ struct AddBoxSheet: View {
                             print("Failed to save box: \(error.localizedDescription)")
                         }
                     }
-                    .disabled(boxName.isEmpty)
+                    .disabled(!isFormValid)
                 }
             }
             .modifier(liquidGlass(.overlay))
         }
+        .onChange(of: boxName) { _, _ in
+            validateForm()
+        }
+        .onAppear {
+            validateForm()
+        }
+    }
+    
+    private var isFormValid: Bool {
+        nameValidation.isValid && !boxName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+    
+    private func validateForm() {
+        nameValidation = validator.validateName(boxName)
     }
 }
 

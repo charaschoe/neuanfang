@@ -9,3 +9,39 @@
 "ADD_BUTTON" = "Add";
 "SAVE_BUTTON" = "Save";
 "CANCEL_BUTTON" = "Cancel";
+
+/* Input Validation Error Messages */
+
+// Email validation
+"validation.email.empty" = "E-Mail-Adresse darf nicht leer sein.";
+"validation.email.tooLong" = "E-Mail-Adresse ist zu lang (max. 254 Zeichen).";
+"validation.email.invalid" = "Bitte geben Sie eine gültige E-Mail-Adresse ein.";
+
+// Name validation
+"validation.name.empty" = "Name darf nicht leer sein.";
+"validation.name.length" = "Name muss zwischen 2 und 50 Zeichen lang sein.";
+"validation.name.invalidCharacters" = "Name darf nur Buchstaben, Leerzeichen und Bindestriche enthalten.";
+"validation.name.consecutiveChars" = "Aufeinanderfolgende Leerzeichen oder Bindestriche sind nicht erlaubt.";
+
+// Address validation
+"validation.address.length" = "Adresse muss zwischen 5 und 200 Zeichen lang sein.";
+"validation.address.invalidCharacters" = "Adresse enthält unerlaubte Zeichen.";
+
+// Description validation
+"validation.description.length" = "Beschreibung darf maximal 500 Zeichen lang sein.";
+
+// Value validation
+"validation.value.empty" = "Wert darf nicht leer sein.";
+"validation.value.notNumeric" = "Wert muss eine gültige Zahl sein.";
+"validation.value.range" = "Wert muss zwischen 0,01 und 999.999,99 liegen.";
+
+// Security validation
+"validation.security.sqlInjection" = "Eingabe enthält nicht erlaubte Zeichen aus Sicherheitsgründen.";
+
+// General validation
+"validation.general.unavailable" = "Validierungsservice nicht verfügbar.";
+
+// CoreData validation
+"validation.room.missingName" = "Raumname ist erforderlich.";
+"validation.box.missingName" = "Kistenname ist erforderlich.";
+"validation.item.missingName" = "Gegenstandsname ist erforderlich.";
