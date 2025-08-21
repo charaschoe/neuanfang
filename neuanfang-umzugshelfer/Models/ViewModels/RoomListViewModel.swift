@@ -25,10 +25,17 @@ final class RoomListViewModel: ObservableObject {
     @Published var showingAddRoom = false
     @Published var selectedRoom: Room?
     
+    // AI Search Properties
+    @Published var smartSearchResults: [SearchResult] = []
+    @Published var isSmartSearching = false
+    @Published var smartSearchSuggestions: [String] = []
+    @Published var isSmartSearchEnabled = true
+    
     // MARK: - Dependencies
     
     private let viewContext: NSManagedObjectContext
     private let cloudKitService: CloudKitService
+    private let smartSearchService: SmartSearchService
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - Computed Properties
@@ -99,9 +106,11 @@ final class RoomListViewModel: ObservableObject {
     // MARK: - Initialization
     
     init(viewContext: NSManagedObjectContext = PersistenceController.shared.container.viewContext,
-         cloudKitService: CloudKitService = CloudKitService.shared) {
+         cloudKitService: CloudKitService = CloudKitService.shared,
+         smartSearchService: SmartSearchService = SmartSearchService()) {
         self.viewContext = viewContext
         self.cloudKitService = cloudKitService
+        self.smartSearchService = smartSearchService
         
         setupBindings()
         loadRooms()
@@ -194,6 +203,138 @@ final class RoomListViewModel: ObservableObject {
     
     func setFilterCriteria(_ criteria: FilterCriteria) {
         filterCriteria = criteria
+    }
+    
+    // MARK: - Smart Search Methods
+    
+    /// Führt eine intelligente Suche durch alle Räume, Kisten und Gegenstände durch
+    func performSmartSearch(query: String) async {
+        guard isSmartSearchEnabled && !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            smartSearchResults = []
+            return
+        }
+        
+        isSmartSearching = true
+        
+        do {
+            let results = try await smartSearchService.performSmartSearch(query: query)
+            await MainActor.run {
+                self.smartSearchResults = results
+                self.isSmartSearching = false
+            }
+        } catch {
+            await MainActor.run {
+                self.errorMessage = "Smart Search Fehler: \(error.localizedDescription)"
+                self.smartSearchResults = []
+                self.isSmartSearching = false
+            }
+        }
+    }
+    
+    /// Generiert intelligente Suchvorschläge
+    func generateSearchSuggestions(for partialQuery: String) async {
+        guard isSmartSearchEnabled && partialQuery.count >= 2 else {
+            smartSearchSuggestions = []
+            return
+        }
+        
+        do {
+            let suggestions = try await smartSearchService.generateSearchSuggestions(for: partialQuery)
+            await MainActor.run {
+                self.smartSearchSuggestions = suggestions
+            }
+        } catch {
+            await MainActor.run {
+                self.smartSearchSuggestions = []
+            }
+        }
+    }
+    
+    /// Führt eine gefilterte Suche durch
+    func performFilteredSmartSearch(query: String, filters: SearchFilters) async {
+        guard isSmartSearchEnabled else {
+            smartSearchResults = []
+            return
+        }
+        
+        isSmartSearching = true
+        
+        do {
+            let results = try await smartSearchService.performFilteredSearch(query: query, filters: filters)
+            await MainActor.run {
+                self.smartSearchResults = results
+                self.isSmartSearching = false
+            }
+        } catch {
+            await MainActor.run {
+                self.errorMessage = "Gefilterte Suche Fehler: \(error.localizedDescription)"
+                self.smartSearchResults = []
+                self.isSmartSearching = false
+            }
+        }
+    }
+    
+    /// Führt eine natürlichsprachige Suche durch
+    func performNaturalLanguageSearch(query: String) async {
+        guard isSmartSearchEnabled && !query.isEmpty else {
+            smartSearchResults = []
+            return
+        }
+        
+        isSmartSearching = true
+        
+        do {
+            let results = try await smartSearchService.performNaturalLanguageSearch(query: query)
+            await MainActor.run {
+                self.smartSearchResults = results
+                self.isSmartSearching = false
+            }
+        } catch {
+            await MainActor.run {
+                self.errorMessage = "Natural Language Search Fehler: \(error.localizedDescription)"
+                self.smartSearchResults = []
+                self.isSmartSearching = false
+            }
+        }
+    }
+    
+    /// Leert die Smart Search Ergebnisse
+    func clearSmartSearchResults() {
+        smartSearchResults = []
+        smartSearchSuggestions = []
+    }
+    
+    /// Schaltet Smart Search ein/aus
+    func toggleSmartSearch() {
+        isSmartSearchEnabled.toggle()
+        if !isSmartSearchEnabled {
+            clearSmartSearchResults()
+        }
+    }
+    
+    /// Navigiert zu einem Suchergebnis
+    func navigateToSearchResult(_ result: SearchResult) {
+        switch result.entity {
+        case .room(let room):
+            selectedRoom = room
+        case .box(let box):
+            selectedRoom = box.room
+        case .item(let item):
+            selectedRoom = item.box?.room
+        }
+    }
+    
+    /// Gibt erweiterte Suchstatistiken zurück
+    func getSearchStatistics() -> SearchStatistics {
+        let totalItems = rooms.reduce(0) { $0 + $1.totalItems }
+        let totalBoxes = rooms.reduce(0) { $0 + $1.totalBoxes }
+        
+        return SearchStatistics(
+            totalRooms: rooms.count,
+            totalBoxes: totalBoxes,
+            totalItems: totalItems,
+            searchableContent: "\(rooms.count) Räume, \(totalBoxes) Kisten, \(totalItems) Gegenstände"
+        )
     }
     
     private func saveContext() {
@@ -355,5 +496,18 @@ struct RoomExportData: Codable {
     
     static var csvHeader: String {
         return "Name,Typ,Abgeschlossen,Fortschritt,Gesamt Kisten,Gepackte Kisten,Gesamt Gegenstände,Erstellt am"
+    }
+}
+
+// MARK: - Search Statistics
+
+struct SearchStatistics {
+    let totalRooms: Int
+    let totalBoxes: Int
+    let totalItems: Int
+    let searchableContent: String
+    
+    var formattedStatistics: String {
+        return "Durchsuchbar: \(searchableContent)"
     }
 }

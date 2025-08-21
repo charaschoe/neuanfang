@@ -29,6 +29,15 @@ final class BoxDetailViewModel: ObservableObject {
     @Published var showingEditBox = false
     @Published var selectedItem: Item?
     
+    // AI Packing Properties
+    @Published var packingSuggestions: [PackingSuggestion] = []
+    @Published var isGeneratingPackingSuggestions = false
+    @Published var packingIssues: [PackingIssue] = []
+    @Published var suggestedBoxLabels: [BoxLabel] = []
+    @Published var isGeneratingLabels = false
+    @Published var packingStrategy: PackingStrategy?
+    @Published var boxSizeRecommendation: BoxSizeRecommendation?
+    
     // Box editing properties
     @Published var boxName = ""
     @Published var boxPriority: BoxPriority = .medium
@@ -40,6 +49,8 @@ final class BoxDetailViewModel: ObservableObject {
     private let viewContext: NSManagedObjectContext
     private let qrCodeService: QRCodeService
     private let nfcService: NFCService
+    private let packingSuggestionService: AIPackingSuggestionService
+    private let labelingService: AILabelingService
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - Properties
@@ -129,10 +140,14 @@ final class BoxDetailViewModel: ObservableObject {
     
     init(viewContext: NSManagedObjectContext = PersistenceController.shared.container.viewContext,
          qrCodeService: QRCodeService = QRCodeService(),
-         nfcService: NFCService = NFCService()) {
+         nfcService: NFCService = NFCService(),
+         packingSuggestionService: AIPackingSuggestionService = AIPackingSuggestionService(),
+         labelingService: AILabelingService = AILabelingService()) {
         self.viewContext = viewContext
         self.qrCodeService = qrCodeService
         self.nfcService = nfcService
+        self.packingSuggestionService = packingSuggestionService
+        self.labelingService = labelingService
         
         setupBindings()
     }
@@ -143,6 +158,12 @@ final class BoxDetailViewModel: ObservableObject {
         self.box = box
         loadBoxData(box)
         loadItems(for: box)
+        
+        // Lade AI-Funktionen automatisch
+        Task {
+            await generatePackingSuggestionsIfNeeded()
+            await generateSmartLabelsIfNeeded()
+        }
     }
     
     // MARK: - Private Methods
@@ -361,6 +382,160 @@ final class BoxDetailViewModel: ObservableObject {
         )
     }
     
+    // MARK: - AI Packing Suggestions
+    
+    /// Generiert intelligente Packvorschläge für die aktuelle Box
+    func generatePackingSuggestions() async {
+        guard let currentBox = box else { return }
+        
+        isGeneratingPackingSuggestions = true
+        
+        do {
+            let suggestions = try await packingSuggestionService.generatePackingSuggestions(for: currentBox)
+            await MainActor.run {
+                self.packingSuggestions = suggestions
+                self.isGeneratingPackingSuggestions = false
+            }
+        } catch {
+            await MainActor.run {
+                self.errorMessage = "Fehler beim Generieren der Packvorschläge: \(error.localizedDescription)"
+                self.isGeneratingPackingSuggestions = false
+            }
+        }
+    }
+    
+    /// Analysiert potentielle Packprobleme
+    func analyzePackingIssues() async {
+        guard let currentBox = box else { return }
+        
+        do {
+            let issues = try await packingSuggestionService.analyzePackingIssues(for: currentBox)
+            await MainActor.run {
+                self.packingIssues = issues
+            }
+        } catch {
+            await MainActor.run {
+                self.errorMessage = "Fehler bei der Packanalyse: \(error.localizedDescription)"
+            }
+        }
+    }
+    
+    /// Schlägt optimale Box-Größe vor
+    func suggestOptimalBoxSize() async {
+        guard !items.isEmpty else { return }
+        
+        do {
+            let recommendation = try await packingSuggestionService.suggestOptimalBoxSize(for: items)
+            await MainActor.run {
+                self.boxSizeRecommendation = recommendation
+            }
+        } catch {
+            await MainActor.run {
+                self.errorMessage = "Fehler bei der Box-Größenempfehlung: \(error.localizedDescription)"
+            }
+        }
+    }
+    
+    /// Generiert optimale Packstrategie für mehrere Items
+    func generateOptimalPackingStrategy(targetBoxCount: Int) async {
+        guard !items.isEmpty else { return }
+        
+        do {
+            let strategy = try await packingSuggestionService.generateOptimalPackingStrategy(
+                for: items,
+                targetBoxCount: targetBoxCount
+            )
+            await MainActor.run {
+                self.packingStrategy = strategy
+            }
+        } catch {
+            await MainActor.run {
+                self.errorMessage = "Fehler bei der Strategiegenerierung: \(error.localizedDescription)"
+            }
+        }
+    }
+    
+    // MARK: - AI Labeling
+    
+    /// Generiert intelligente Beschriftungsoptionen
+    func generateSmartLabels() async {
+        guard let currentBox = box else { return }
+        
+        isGeneratingLabels = true
+        
+        do {
+            let labels = try await labelingService.generateLabelOptions(for: currentBox, count: 3)
+            await MainActor.run {
+                self.suggestedBoxLabels = labels
+                self.isGeneratingLabels = false
+            }
+        } catch {
+            await MainActor.run {
+                self.errorMessage = "Fehler beim Generieren der Beschriftungen: \(error.localizedDescription)"
+                self.isGeneratingLabels = false
+            }
+        }
+    }
+    
+    /// Wendet eine ausgewählte Beschriftung an
+    func applySelectedLabel(_ label: BoxLabel) {
+        guard let currentBox = box else { return }
+        
+        // Aktualisiere Box-Name basierend auf dem Label
+        boxName = label.mainText
+        currentBox.name = label.mainText
+        
+        saveContext()
+    }
+    
+    /// Generiert optimierten QR-Code Inhalt
+    func generateOptimizedQRCode() async -> QRCodeContent? {
+        guard let currentBox = box else { return nil }
+        
+        do {
+            return try await labelingService.generateQRCodeContent(for: currentBox)
+        } catch {
+            await MainActor.run {
+                self.errorMessage = "Fehler beim QR-Code generieren: \(error.localizedDescription)"
+            }
+            return nil
+        }
+    }
+    
+    // MARK: - AI Integration Helpers
+    
+    /// Lädt AI-Vorschläge automatisch bei Bedarf
+    private func generatePackingSuggestionsIfNeeded() async {
+        guard !items.isEmpty && packingSuggestions.isEmpty else { return }
+        await generatePackingSuggestions()
+        await analyzePackingIssues()
+    }
+    
+    /// Lädt intelligente Labels automatisch bei Bedarf
+    private func generateSmartLabelsIfNeeded() async {
+        guard let currentBox = box, !items.isEmpty && suggestedBoxLabels.isEmpty else { return }
+        await generateSmartLabels()
+    }
+    
+    /// Führt eine vollständige AI-Analyse der Box durch
+    func performComprehensiveAIAnalysis() async {
+        await generatePackingSuggestions()
+        await analyzePackingIssues()
+        await suggestOptimalBoxSize()
+        await generateSmartLabels()
+    }
+    
+    /// Gibt AI-basierte Empfehlungen für die Box zurück
+    func getAIRecommendations() -> BoxAIRecommendations {
+        return BoxAIRecommendations(
+            hasSuggestions: !packingSuggestions.isEmpty,
+            hasIssues: !packingIssues.isEmpty,
+            criticalIssuesCount: packingIssues.filter { $0.severity == .high }.count,
+            bestLabel: suggestedBoxLabels.first,
+            recommendedSize: boxSizeRecommendation?.size.displayName
+        )
+    }
+    
     private func saveContext() {
         do {
             try viewContext.save()
@@ -469,4 +644,41 @@ protocol NFCServiceProtocol {
     func writeNFCTag(with data: BoxShareData)
     var isWriting: Bool { get }
     var message: String { get }
+}
+// MARK: - AI Recommendations
+
+struct BoxAIRecommendations {
+    let hasSuggestions: Bool
+    let hasIssues: Bool
+    let criticalIssuesCount: Int
+    let bestLabel: BoxLabel?
+    let recommendedSize: String?
+    
+    var needsAttention: Bool {
+        return hasIssues || criticalIssuesCount > 0
+    }
+    
+    var aiStatusSummary: String {
+        var components: [String] = []
+        
+        if hasSuggestions {
+            components.append("Packvorschläge verfügbar")
+        }
+        
+        if criticalIssuesCount > 0 {
+            components.append("\(criticalIssuesCount) kritische Probleme")
+        } else if hasIssues {
+            components.append("Kleinere Probleme erkannt")
+        }
+        
+        if let bestLabel = bestLabel {
+            components.append("Smart Label: \(bestLabel.mainText)")
+        }
+        
+        if let recommendedSize = recommendedSize {
+            components.append("Empfohlene Größe: \(recommendedSize)")
+        }
+        
+        return components.isEmpty ? "AI-Analyse ausstehend" : components.joined(separator: " • ")
+    }
 }
