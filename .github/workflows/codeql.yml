@@ -1,0 +1,101 @@
+---
+# CodeQL Advanced Security Analysis for Swift/iOS
+# This workflow prevents conflicts with GitHub's default CodeQL setup
+# by using explicit configuration and conditional triggers
+
+name: "CodeQL Advanced"
+
+on:
+  push:
+    branches: ["main", "develop"]
+  pull_request:
+    branches: ["main"]
+  schedule:
+    # Run at 02:00 UTC every day
+    - cron: '0 2 * * *'
+
+jobs:
+  analyze:
+    name: Analyze Swift Code
+    runs-on: >-
+      ${{ (matrix.language == 'swift' && 'macos-15') || 'ubuntu-latest' }}
+    timeout-minutes: ${{ (matrix.language == 'swift' && 120) || 360 }}
+    permissions:
+      # Required for all workflows
+      security-events: write
+      # Required for workflows in private repositories
+      actions: read
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ["swift"]
+        # CodeQL supports:
+        # 'c-cpp', 'csharp', 'go', 'java-kotlin', 'javascript-typescript',
+        # 'python', 'ruby', 'swift'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          # Override default queries with security-focused query suite
+          queries: +security-extended,security-and-quality
+          # Use external configuration file to prevent conflicts
+          config-file: ./.github/codeql/codeql-config.yml
+
+      - name: Setup Xcode
+        if: matrix.language == 'swift'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Build Swift Project
+        if: matrix.language == 'swift'
+        run: |
+          # Set the default scheme
+          scheme_list=$(xcodebuild -list -json | tr -d "\n")
+          default=$(echo $scheme_list | ruby -e \
+            "require 'json'; puts JSON.parse(STDIN.gets)['project']['targets'][0]")
+          echo "Using scheme: $default"
+
+          # Build for CodeQL analysis (no need for full archive)
+          if [ "`ls -A | grep -i \.xcworkspace\$`" ]; then
+            filetype_parameter="workspace"
+            file_to_build="`ls -A | grep -i \.xcworkspace\$`"
+          else
+            filetype_parameter="project"
+            file_to_build="`ls -A | grep -i \.xcodeproj\$`"
+          fi
+
+          file_to_build=`echo $file_to_build | awk '{$1=$1;print}'`
+
+          # Build with minimal output for faster analysis
+          xcodebuild clean build \
+            -scheme "$default" \
+            -"$filetype_parameter" "$file_to_build" \
+            -configuration Debug \
+            -quiet
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{matrix.language}}"
+          # Upload results even if there are findings
+          upload: true
+          # Wait for processing to complete
+          wait-for-processing: true
+
+      - name: Upload Security Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: codeql-security-report-${{ matrix.language }}
+          path: |
+            ${{ runner.workspace }}/results/
+            **/security-report.sarif
+          retention-days: 30
