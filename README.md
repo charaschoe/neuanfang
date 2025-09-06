@@ -282,6 +282,24 @@ xcodebuild test -scheme neuanfang-umzugshelfer -destination 'platform=iOS Simula
 xcodebuild test -scheme neuanfang-umzugshelfer-UITests -destination 'platform=iOS Simulator,name=iPhone 15 Pro'
 ```
 
+## 🔒 Security & Code Analysis
+
+Das Projekt implementiert moderne Sicherheitsstandards und kontinuierliche Code-Analyse:
+
+### CodeQL Advanced Security Scanning
+- **Automatisierte Sicherheitsanalyse:** Tägliche CodeQL-Scans identifizieren potenzielle Sicherheitslücken
+- **Swift-optimierte Konfiguration:** Speziell für iOS/Swift-Projekte konfiguriert
+- **Pull Request Checks:** Automatische Sicherheitsprüfungen bei Code-Änderungen
+- **Konflikt-freie Konfiguration:** Vermeidet Konflikte mit GitHub's Standard-CodeQL-Setup
+
+### Sicherheitsfeatures
+- **End-to-End-Verschlüsselung:** Alle CloudKit-Daten sind verschlüsselt
+- **Lokale Datenverschlüsselung:** Core Data mit File Protection Level "complete"
+- **Sichere KI-Integration:** On-Device Processing mit Foundation Models Framework
+- **Privacy by Design:** Minimale Datensammlung und lokale Verarbeitung
+
+Detaillierte Informationen zur Sicherheitskonfiguration finden Sie in [CODEQL_SECURITY_SETUP.md](./CODEQL_SECURITY_SETUP.md).
+
 ## 🤝 Beitragen
 
 Wir freuen uns über Beiträge! Bitte beachte:
@@ -292,6 +310,7 @@ Wir freuen uns über Beiträge! Bitte beachte:
 
 ## 📚 Weitere Dokumentation
 
+- [`CODEQL_SECURITY_SETUP.md`](CODEQL_SECURITY_SETUP.md) - CodeQL Sicherheitsanalyse Setup
 - [`CoreDataEncryptionValidation.md`](neuanfang-umzugshelfer/CoreDataEncryptionValidation.md) - Core Data Verschlüsselung
 - [`INPUT_VALIDATION_DOCUMENTATION.md`](neuanfang-umzugshelfer/INPUT_VALIDATION_DOCUMENTATION.md) - Input Validation
 - [`PrivacyPolicy.md`](neuanfang-umzugshelfer/Resources/PrivacyPolicy.md) - Datenschutzrichtlinie

@@ -1,0 +1,46 @@
+# CodeQL Configuration for neuanfang-umzugshelfer
+# This configuration prevents conflicts with GitHub's default CodeQL setup
+
+name: "neuanfang-umzugshelfer CodeQL Advanced Configuration"
+
+# Disable default queries to prevent conflicts
+disable-default-queries: false
+
+# Define custom query suites focused on security
+query-filters:
+  - include:
+      kind: problem
+      problem.severity: 
+        - error
+        - warning
+        - recommendation
+  - include:
+      kind: path-problem
+      problem.severity:
+        - error
+        - warning
+  - exclude:
+      id: 
+        - swift/unused-local-variable
+        - swift/dead-store-in-loop
+
+# Define paths to analyze
+paths:
+  - "neuanfang-umzugshelfer/**/*.swift"
+
+# Exclude test files and generated content from analysis
+paths-ignore:
+  - "neuanfang-umzugshelferTests/**"
+  - "**/Preview Content/**"
+  - "**/.build/**"
+  - "**/DerivedData/**"
+  - "**/*.generated.swift"
+
+# Swift-specific compilation database configuration
+compilation-options:
+  # Use Debug configuration for analysis
+  - "-configuration"
+  - "Debug"
+  # Enable additional warnings
+  - "-Xfrontend"
+  - "-warn-long-function-bodies=100"
