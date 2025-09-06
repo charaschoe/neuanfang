@@ -62,7 +62,7 @@ jobs:
           default=$(echo $scheme_list | ruby -e \
             "require 'json'; puts JSON.parse(STDIN.gets)['project']['targets'][0]")
           echo "Using scheme: $default"
-
+          
           # Build for CodeQL analysis (no need for full archive)
           if [ "`ls -A | grep -i \.xcworkspace\$`" ]; then
             filetype_parameter="workspace"
@@ -71,14 +71,15 @@ jobs:
             filetype_parameter="project"
             file_to_build="`ls -A | grep -i \.xcodeproj\$`"
           fi
-
+          
           file_to_build=`echo $file_to_build | awk '{$1=$1;print}'`
-
+          
           # Build with minimal output for faster analysis
           xcodebuild clean build \
             -scheme "$default" \
             -"$filetype_parameter" "$file_to_build" \
             -configuration Debug \
+            -allowProvisioningUpdates \
             -quiet
 
       - name: Perform CodeQL Analysis
