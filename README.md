@@ -1,8 +1,10 @@
 # 📦 neuanfang: Umzugshelfer - Dein smarter Umzugsbegleiter
 
-> **⚠️ App Store Status:** 70% fertig - [Siehe vollständige Kompatibilitätsanalyse](docs/APP_STORE_COMPATIBILITY.md)
+> **⚠️ App Store Status:** 85% fertig - [Siehe vollständige Kompatibilitätsanalyse](docs/APP_STORE_COMPATIBILITY.md)
 >
-> **Kritische fehlende Elemente:** App-Icons, Screenshots, App Store Metadaten
+> **✅ NEU:** App Store Metadaten erstellt! - [Siehe APP_STORE_METADATA.md](docs/APP_STORE_METADATA.md)
+>
+> **Kritische fehlende Elemente:** App-Icons (Design benötigt), Screenshots (App ausführen benötigt)
 
 "neuanfang: Umzugshelfer" ist eine intelligente iOS-Anwendung der nächsten Generation, die entwickelt wurde, um den Umzugsprozess zu revolutionieren und zu organisieren. Von der KI-gestützten Verwaltung einzelner Gegenstände in Kisten bis zur automatisierten Planung des gesamten Umzugs bietet diese App eine umfassende Lösung für einen völlig stressfreien Neuanfang.
 
@@ -317,6 +319,7 @@ Wir freuen uns über Beiträge! Bitte beachte:
 ### App Store Vorbereitung
 - [`docs/APP_STORE_COMPATIBILITY.md`](docs/APP_STORE_COMPATIBILITY.md) - **Vollständige App Store Kompatibilitätsanalyse**
 - [`docs/APP_STORE_CHECKLIST.md`](docs/APP_STORE_CHECKLIST.md) - App Store Release Checkliste
+- [`docs/APP_STORE_METADATA.md`](docs/APP_STORE_METADATA.md) - **✨ NEU: Fertige deutsche Metadaten**
 
 ### Benutzer-Dokumentation
 - [`PrivacyPolicy.md`](neuanfang-umzugshelfer/Resources/PrivacyPolicy.md) - Datenschutzrichtlinie

@@ -2,9 +2,11 @@
 
 ## Executive Summary
 
-**Overall Status:** 🟡 **PARTIALLY READY** - Core functionality exists but critical assets are missing
+**Overall Status:** 🟡 **NEARLY READY** - Core functionality exists, metadata created, only assets missing
 
-**Completion:** Approximately 70% complete for App Store submission
+**Completion:** Approximately 85% complete for App Store submission
+
+**What's Left:** App icons (design required) and screenshots (app needs to be run)
 
 ---
 
@@ -37,6 +39,16 @@
 - [x] Liquid Glass Design System implemented
 - [x] Comprehensive service layer (QR, NFC, Camera, CloudKit)
 - [x] Unit tests for ViewModels exist
+
+### App Store Metadata ✅ **NEW!**
+- [x] German app description (2,200 chars)
+- [x] App name and subtitle defined
+- [x] Keywords optimized (88 chars)
+- [x] Version 1.0 release notes written
+- [x] Support URL configured (GitHub Issues)
+- [x] Screenshot descriptions prepared
+- [x] App review notes documented
+- [x] **See:** `docs/APP_STORE_METADATA.md`
 
 ---
 
@@ -103,61 +115,52 @@ App Store:
 3. Optionally: Add marketing text/captions
 4. Upload to App Store Connect
 
-### 3. App Store Metadata - CRITICAL ⚠️
-**Status:** NOT CREATED
+### 3. App Store Metadata - ✅ CREATED
+**Status:** ✅ COMPLETE
 
-**Required Information (in German):**
+**File:** `docs/APP_STORE_METADATA.md`
 
-**App Name (max 30 chars):**
-- Suggestion: "Neuanfang Umzugshelfer"
+**Created Content:**
+- ✅ App Name: "Neuanfang Umzugshelfer" (24 chars)
+- ✅ Subtitle: "Smart Umzug organisieren" (25 chars)
+- ✅ Keywords: 88 chars (under 100 limit)
+- ✅ German Description: ~2,200 chars (under 4000 limit)
+- ✅ Version 1.0 Release Notes
+- ✅ Support URL: GitHub Issues
+- ✅ Marketing URL: GitHub Repository
+- ✅ Screenshot descriptions (5 screenshots)
+- ✅ App Review notes
 
-**Subtitle (max 30 chars):**
-- Suggestion: "Smart Umzug organisieren"
-
-**Keywords (max 100 chars, comma-separated):**
-- Suggestion: "umzug,moving,kisten,qr,organisation,planung,inventar,timeline,familie,box"
-
-**Description (max 4000 chars):**
-- Needs to be written highlighting:
-  - Smart box management with QR/NFC
-  - AI-powered item recognition
-  - Timeline planning
-  - CloudKit sync
-  - Family collaboration
-  - Privacy-focused
-
-**What's New (Version 1.0):**
-- First release notes
-
-**Support URL:**
-- Needs to be created (GitHub repo or dedicated support page)
-
-**Marketing URL (optional):**
-- Could be GitHub repo or landing page
-
-**Action Required:**
-1. Write compelling German app description
-2. Set up support URL (can use GitHub issues)
-3. Prepare version 1.0 release notes
+**Action Completed:**
+All metadata has been written and documented in `docs/APP_STORE_METADATA.md`. Ready to copy into App Store Connect.
 
 ---
 
 ## 🟡 Recommended Before Submission
 
 ### 4. Info.plist Privacy Descriptions
-**Status:** NEEDS VERIFICATION
+**Status:** ✅ MOSTLY COMPLETE - NFC Missing
 
-**Required Usage Descriptions:**
-- [ ] `NSCameraUsageDescription` - "Für Fotos von Umzugsgegenständen"
-- [ ] `NSPhotoLibraryAddUsageDescription` - "Zum Speichern von Gegenstandsfotos"
-- [ ] `NSLocationWhenInUseUsageDescription` - "Für Umzugsservices in Ihrer Nähe"
-- [ ] `NSContactsUsageDescription` - "Für Familienmitglieder-Kollaboration"
-- [ ] `NFCReaderUsageDescription` - "Zum Lesen von NFC-Tags auf Kisten"
+**Verified Present:**
+- [x] `NSCameraUsageDescription` - "Die App benötigt Zugriff auf die Kamera, um Fotos von Ihren Gegenständen zu machen."
+- [x] `NSPhotoLibraryUsageDescription` - "Die App benötigt Zugriff auf Ihre Fotobibliothek, um Fotos von Gegenständen zu speichern und zu laden."
+- [x] `NSLocationWhenInUseUsageDescription` - "Die App benötigt Ihren Standort, um Umzugsservices in Ihrer Nähe zu finden."
+- [x] `NSContactsUsageDescription` - "Die App kann auf Ihre Kontakte zugreifen, um Familienmitglieder zum Umzug einzuladen."
+
+**Missing:**
+- [ ] `NFCReaderUsageDescription` - Needs to be added
+
+**Recommended Value for NFC:**
+```
+"Die App nutzt NFC, um Tags auf Ihren Umzugskisten zu lesen und schnell den Inhalt anzuzeigen."
+```
 
 **Action Required:**
-1. Locate Info.plist file
-2. Verify all usage descriptions are present
-3. Add any missing descriptions
+1. Add NFC usage description to Xcode project settings
+   - Open project in Xcode
+   - Go to Info tab
+   - Add Custom iOS Target Property: "Privacy - NFC Scan Usage Description"
+   - Or add to project.pbxproj: `INFOPLIST_KEY_NFCReaderUsageDescription`
 
 ### 5. Testing
 **Status:** BASIC COVERAGE EXISTS
@@ -214,11 +217,14 @@ App Store:
 
 ## Action Plan
 
-### Week 1: Critical Assets
-1. **Day 1-2:** Design and create app icons (all sizes)
-2. **Day 3-4:** Capture and prepare screenshots
-3. **Day 5:** Write App Store metadata in German
-4. **Day 6-7:** Verify Info.plist and build configuration
+### ✅ COMPLETED
+1. ~~Write App Store metadata in German~~ ✅ **DONE** - See `docs/APP_STORE_METADATA.md`
+2. ~~Verify Info.plist privacy descriptions~~ ✅ **DONE** - 4/5 present (NFC needs manual addition)
+
+### Week 1: Critical Assets (Remaining)
+1. **Day 1:** Add NFC privacy description in Xcode (5 minutes)
+2. **Day 1-2:** Design and create app icons (all 17 sizes)
+3. **Day 3-4:** Capture and prepare screenshots (5 screenshots minimum)
 
 ### Week 2: Testing & Submission
 1. **Day 1-3:** Expand test coverage and test on devices
@@ -234,17 +240,18 @@ App Store:
 
 ## Estimated Effort
 
-**Critical Items (Required):**
+**Critical Items (Remaining):**
+- NFC Privacy Description: 5 minutes (manual in Xcode)
 - App Icons: 4-8 hours (design + generation)
 - Screenshots: 2-4 hours
-- Metadata: 2-3 hours
-- Info.plist verification: 1 hour
-- **Total: 9-16 hours**
+- ~~Metadata: 2-3 hours~~ ✅ **COMPLETED**
+- ~~Info.plist verification: 1 hour~~ ✅ **COMPLETED**
+- **Total Remaining: 6-12 hours**
 
 **Recommended Items:**
 - Testing expansion: 8-16 hours
 - Beta testing: 1-2 weeks
-- **Total: 2-3 weeks with beta**
+- **Total: 1-2 weeks with beta**
 
 ---
 

@@ -10,8 +10,30 @@
 - [x] CloudKit integration configured
 - [x] Input validation documented
 - [x] CodeQL security scanning configured
+- [x] **App Store Metadata created** ✨ NEW! (`docs/APP_STORE_METADATA.md`)
+  - [x] German app description (2,200 characters)
+  - [x] App name: "Neuanfang Umzugshelfer"
+  - [x] Subtitle: "Smart Umzug organisieren"
+  - [x] Keywords optimized (88 chars)
+  - [x] Version 1.0 release notes
+  - [x] Support URL (GitHub Issues)
+  - [x] Screenshot descriptions
+- [x] **Info.plist Privacy Descriptions verified** (4/5 present)
+  - [x] Camera usage
+  - [x] Photo Library usage
+  - [x] Location usage
+  - [x] Contacts usage
 
 ### ❌ Missing - Required for Submission
+
+#### 0. NFC Privacy Description (5 minutes)
+**Status:** 🟡 MINOR - Easy manual fix in Xcode
+
+**Action:** Add to Xcode project Info settings:
+```
+Key: Privacy - NFC Scan Usage Description (NFCReaderUsageDescription)
+Value: "Die App nutzt NFC, um Tags auf Ihren Umzugskisten zu lesen und schnell den Inhalt anzuzeigen."
+```
 
 #### 1. App Icons
 **Status:** 🔴 CRITICAL - NO ICON FILES EXIST  
@@ -39,17 +61,22 @@ Screenshots should show:
 4. Timeline/planning view
 5. Collaboration features
 
-#### 3. App Store Metadata
-**Status:** 🔴 CRITICAL
+**Screenshot descriptions prepared:** See `docs/APP_STORE_METADATA.md` for German captions
 
-Required in German:
-- App title (max 30 chars)
-- Subtitle (max 30 chars)
-- Keywords (max 100 chars, comma-separated)
-- Description (max 4000 chars)
-- What's New notes for version 1.0
-- Support URL
-- Marketing URL
+#### 3. ~~App Store Metadata~~ ✅ **COMPLETED**
+**Status:** ✅ ALL CREATED - See `docs/APP_STORE_METADATA.md`
+
+**Completed:**
+- ✅ App name: "Neuanfang Umzugshelfer" (24 chars)
+- ✅ Subtitle: "Smart Umzug organisieren" (25 chars)
+- ✅ Keywords: 88 chars (optimized for German market)
+- ✅ Description: ~2,200 chars in German
+- ✅ Version 1.0 release notes
+- ✅ Support URL: GitHub Issues
+- ✅ Marketing URL: GitHub Repository
+- ✅ App review notes
+
+**Action:** Ready to copy into App Store Connect
 
 #### 4. Xcode Build Configuration
 **Status:** 🟠 VERIFY REQUIRED
