@@ -1,5 +1,11 @@
 # 📦 neuanfang: Umzugshelfer - Dein smarter Umzugsbegleiter
 
+> **⚠️ App Store Status:** 85% fertig - [Siehe vollständige Kompatibilitätsanalyse](docs/APP_STORE_COMPATIBILITY.md)
+>
+> **✅ NEU:** App Store Metadaten erstellt! - [Siehe APP_STORE_METADATA.md](docs/APP_STORE_METADATA.md)
+>
+> **Kritische fehlende Elemente:** App-Icons (Design benötigt), Screenshots (App ausführen benötigt)
+
 "neuanfang: Umzugshelfer" ist eine intelligente iOS-Anwendung der nächsten Generation, die entwickelt wurde, um den Umzugsprozess zu revolutionieren und zu organisieren. Von der KI-gestützten Verwaltung einzelner Gegenstände in Kisten bis zur automatisierten Planung des gesamten Umzugs bietet diese App eine umfassende Lösung für einen völlig stressfreien Neuanfang.
 
 ## ✨ Features
@@ -308,13 +314,23 @@ Wir freuen uns über Beiträge! Bitte beachte:
 - Teste neue Features sowohl im Simulator als auch auf physischen Geräten
 - Dokumentiere WWDC 2025 Feature-Implementierungen ausführlich
 
-## 📚 Weitere Dokumentation
+## 📚 Dokumentation
 
-- [`CODEQL_SECURITY_SETUP.md`](CODEQL_SECURITY_SETUP.md) - CodeQL Sicherheitsanalyse Setup
-- [`CoreDataEncryptionValidation.md`](neuanfang-umzugshelfer/CoreDataEncryptionValidation.md) - Core Data Verschlüsselung
-- [`INPUT_VALIDATION_DOCUMENTATION.md`](neuanfang-umzugshelfer/INPUT_VALIDATION_DOCUMENTATION.md) - Input Validation
+### App Store Vorbereitung
+- [`docs/APP_STORE_COMPATIBILITY.md`](docs/APP_STORE_COMPATIBILITY.md) - **Vollständige App Store Kompatibilitätsanalyse**
+- [`docs/APP_STORE_CHECKLIST.md`](docs/APP_STORE_CHECKLIST.md) - App Store Release Checkliste
+- [`docs/APP_STORE_METADATA.md`](docs/APP_STORE_METADATA.md) - **✨ NEU: Fertige deutsche Metadaten**
+
+### Benutzer-Dokumentation
 - [`PrivacyPolicy.md`](neuanfang-umzugshelfer/Resources/PrivacyPolicy.md) - Datenschutzrichtlinie
+- [`TermsOfService.md`](neuanfang-umzugshelfer/Resources/TermsOfService.md) - Nutzungsbedingungen
 - [`CHANGELOG.md`](CHANGELOG.md) - Versionshistorie
+
+### Entwickler-Dokumentation
+- [`docs/DEVELOPMENT_NOTES.md`](docs/DEVELOPMENT_NOTES.md) - Entwicklungsnotizen und Best Practices
+- [`docs/GITHUB_WORKFLOWS.md`](docs/GITHUB_WORKFLOWS.md) - GitHub Actions Workflows
+- [`neuanfang-umzugshelfer/CoreDataEncryptionValidation.md`](neuanfang-umzugshelfer/CoreDataEncryptionValidation.md) - Core Data Verschlüsselung
+- [`neuanfang-umzugshelfer/INPUT_VALIDATION_DOCUMENTATION.md`](neuanfang-umzugshelfer/INPUT_VALIDATION_DOCUMENTATION.md) - Input Validation
 
 ## 📝 Lizenz
 
