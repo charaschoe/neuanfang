@@ -1,5 +1,9 @@
 # 📦 neuanfang: Umzugshelfer - Dein smarter Umzugsbegleiter
 
+> **⚠️ App Store Status:** 70% fertig - [Siehe vollständige Kompatibilitätsanalyse](docs/APP_STORE_COMPATIBILITY.md)
+>
+> **Kritische fehlende Elemente:** App-Icons, Screenshots, App Store Metadaten
+
 "neuanfang: Umzugshelfer" ist eine intelligente iOS-Anwendung der nächsten Generation, die entwickelt wurde, um den Umzugsprozess zu revolutionieren und zu organisieren. Von der KI-gestützten Verwaltung einzelner Gegenstände in Kisten bis zur automatisierten Planung des gesamten Umzugs bietet diese App eine umfassende Lösung für einen völlig stressfreien Neuanfang.
 
 ## ✨ Features
@@ -310,13 +314,16 @@ Wir freuen uns über Beiträge! Bitte beachte:
 
 ## 📚 Dokumentation
 
+### App Store Vorbereitung
+- [`docs/APP_STORE_COMPATIBILITY.md`](docs/APP_STORE_COMPATIBILITY.md) - **Vollständige App Store Kompatibilitätsanalyse**
+- [`docs/APP_STORE_CHECKLIST.md`](docs/APP_STORE_CHECKLIST.md) - App Store Release Checkliste
+
 ### Benutzer-Dokumentation
 - [`PrivacyPolicy.md`](neuanfang-umzugshelfer/Resources/PrivacyPolicy.md) - Datenschutzrichtlinie
 - [`TermsOfService.md`](neuanfang-umzugshelfer/Resources/TermsOfService.md) - Nutzungsbedingungen
 - [`CHANGELOG.md`](CHANGELOG.md) - Versionshistorie
 
 ### Entwickler-Dokumentation
-- [`docs/APP_STORE_CHECKLIST.md`](docs/APP_STORE_CHECKLIST.md) - App Store Release Checkliste
 - [`docs/DEVELOPMENT_NOTES.md`](docs/DEVELOPMENT_NOTES.md) - Entwicklungsnotizen und Best Practices
 - [`docs/GITHUB_WORKFLOWS.md`](docs/GITHUB_WORKFLOWS.md) - GitHub Actions Workflows
 - [`neuanfang-umzugshelfer/CoreDataEncryptionValidation.md`](neuanfang-umzugshelfer/CoreDataEncryptionValidation.md) - Core Data Verschlüsselung
