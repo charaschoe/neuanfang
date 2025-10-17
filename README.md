@@ -308,13 +308,19 @@ Wir freuen uns über Beiträge! Bitte beachte:
 - Teste neue Features sowohl im Simulator als auch auf physischen Geräten
 - Dokumentiere WWDC 2025 Feature-Implementierungen ausführlich
 
-## 📚 Weitere Dokumentation
+## 📚 Dokumentation
 
-- [`CODEQL_SECURITY_SETUP.md`](CODEQL_SECURITY_SETUP.md) - CodeQL Sicherheitsanalyse Setup
-- [`CoreDataEncryptionValidation.md`](neuanfang-umzugshelfer/CoreDataEncryptionValidation.md) - Core Data Verschlüsselung
-- [`INPUT_VALIDATION_DOCUMENTATION.md`](neuanfang-umzugshelfer/INPUT_VALIDATION_DOCUMENTATION.md) - Input Validation
+### Benutzer-Dokumentation
 - [`PrivacyPolicy.md`](neuanfang-umzugshelfer/Resources/PrivacyPolicy.md) - Datenschutzrichtlinie
+- [`TermsOfService.md`](neuanfang-umzugshelfer/Resources/TermsOfService.md) - Nutzungsbedingungen
 - [`CHANGELOG.md`](CHANGELOG.md) - Versionshistorie
+
+### Entwickler-Dokumentation
+- [`docs/APP_STORE_CHECKLIST.md`](docs/APP_STORE_CHECKLIST.md) - App Store Release Checkliste
+- [`docs/DEVELOPMENT_NOTES.md`](docs/DEVELOPMENT_NOTES.md) - Entwicklungsnotizen und Best Practices
+- [`docs/GITHUB_WORKFLOWS.md`](docs/GITHUB_WORKFLOWS.md) - GitHub Actions Workflows
+- [`neuanfang-umzugshelfer/CoreDataEncryptionValidation.md`](neuanfang-umzugshelfer/CoreDataEncryptionValidation.md) - Core Data Verschlüsselung
+- [`neuanfang-umzugshelfer/INPUT_VALIDATION_DOCUMENTATION.md`](neuanfang-umzugshelfer/INPUT_VALIDATION_DOCUMENTATION.md) - Input Validation
 
 ## 📝 Lizenz
 
