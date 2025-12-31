@@ -1,0 +1,175 @@
+:root {
+  /* iOS System Colors */
+  --system-blue: #007AFF;
+  --system-red: #FF3B30;
+  --system-green: #34C759;
+  --system-orange: #FF9500;
+  --system-gray: #8E8E93;
+  --system-gray2: #AEAEB2;
+  --system-gray3: #C7C7CC;
+  --system-gray4: #D1D1D6;
+  --system-gray5: #E5E5EA;
+  --system-gray6: #F2F2F7;
+
+  /* Backgrounds */
+  --bg-primary: #F2F2F7;
+  /* Grouped Table View Background */
+  --bg-card: rgba(255, 255, 255, 0.8);
+  --bg-float: rgba(255, 255, 255, 0.4);
+
+  /* Text */
+  --label-primary: #000000;
+  --label-secondary: rgba(60, 60, 67, 0.6);
+  --label-tertiary: rgba(60, 60, 67, 0.3);
+
+  /* Materials */
+  --material-regular: saturate(180%) blur(20px);
+  --material-thick: saturate(180%) blur(40px);
+
+  /* Separators */
+  --separator: rgba(60, 60, 67, 0.29);
+  /* 0.5px equivalent roughly */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #000000;
+    --bg-card: rgba(28, 28, 30, 0.65);
+    --bg-float: rgba(30, 30, 30, 0.4);
+
+    --label-primary: #FFFFFF;
+    --label-secondary: rgba(235, 235, 245, 0.6);
+    --label-tertiary: rgba(235, 235, 245, 0.3);
+
+    --system-gray6: #1C1C1E;
+    --separator: rgba(84, 84, 88, 0.5);
+  }
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--label-primary);
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  padding-bottom: 83px;
+  /* Standard Tab Bar Height */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Typography matching SF Pro */
+.large-title {
+  font-size: 34px;
+  line-height: 41px;
+  font-weight: 700;
+  letter-spacing: 0.37px;
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.title-2 {
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 700;
+  letter-spacing: 0.35px;
+}
+
+.headline {
+  font-size: 17px;
+  line-height: 22px;
+  font-weight: 600;
+  letter-spacing: -0.41px;
+}
+
+.body-text {
+  font-size: 17px;
+  line-height: 22px;
+  font-weight: 400;
+  letter-spacing: -0.41px;
+}
+
+.caption-1 {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+  letter-spacing: 0px;
+  color: var(--label-secondary);
+}
+
+/* iOS Components */
+
+/* The "Inset Grouped" Card Style */
+.ios-card {
+  background: var(--bg-card);
+  backdrop-filter: var(--material-regular);
+  -webkit-backdrop-filter: var(--material-regular);
+  border-radius: 12px;
+  /* iOS standard for grouped lists seems to be 10-12px */
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+/* List Row */
+.ios-row {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 11px 16px;
+  position: relative;
+  transition: background 0.2s;
+}
+
+.ios-row:active {
+  background: rgba(0, 0, 0, 0.05);
+  /* Touch feedback */
+}
+
+.ios-row:not(:last-child):after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 16px;
+  /* Inset separator */
+  right: 0;
+  height: 0.5px;
+  background-color: var(--separator);
+}
+
+.ios-icon-container {
+  width: 29px;
+  height: 29px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  color: white;
+  flex-shrink: 0;
+}
+
+/* Vibrant Tab Bar */
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 83px;
+  /* 49px + 34px safe area */
+  background: rgba(249, 249, 249, 0.78);
+  /* Light mode standard */
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  display: flex;
+  justify-content: space-around;
+  padding-bottom: 34px;
+  border-top: 0.5px solid rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+}
+
+@media (prefers-color-scheme: dark) {
+  .tab-bar {
+    background: rgba(30, 30, 30, 0.75);
+    border-top: 0.5px solid rgba(255, 255, 255, 0.15);
+  }
+}
